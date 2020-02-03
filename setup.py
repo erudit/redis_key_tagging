@@ -4,14 +4,19 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="eruditcache",
+    name="redis_key_tagging",
     version="0.0.1",
-    author="Erudit",
-    author_email="info@erudit.org",
-    description="Redis wrapper to group cache keys in Redis sets for easier cache invalidation.",
+    author="Consortium Érudit",
+    author_email="tech@erudit.org",
+    description="A Redis client with key tagging and invalidation by tag features.",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://gitlab.erudit.org/erudit/portail/eruditcache",
+    url="https://github.com/erudit/redis_key_tagging",
     packages=setuptools.find_packages(),
-    python_requires='>=3.6',
+    classifiers=[
+        "Programming Language :: Python :: 3",
+        "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+        "Operating System :: OS Independent",
+    ],
+    python_requires=">=3.6",
 )
