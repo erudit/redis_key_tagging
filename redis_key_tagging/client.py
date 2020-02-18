@@ -12,7 +12,7 @@ class RedisKeyTagging(Redis):
         """
         Get the key for a given ``tag`` by prexing it with the ``TAG_KEY_PREFIX`` class attribute.
         """
-        if isinstance(tag, str) and tag.isalnum():
+        if tag is not None and isinstance(tag, str) and tag.strip():
             return f"{self.TAG_KEY_PREFIX}{tag}"
         else:
             return None
