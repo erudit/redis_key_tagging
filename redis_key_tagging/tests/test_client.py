@@ -16,21 +16,20 @@ class TestRedisKeyTagging:
             ("foo.bar", "tag:foo.bar"),
             (" ", None),
             ("", None),
-            ([], None),
-            (None, None),
-            (True, None),
-            (False, None),
         ),
     )
     def test_get_tag_key(self, tag, expected_tag_key):
         redis = RedisKeyTagging()
-        assert redis.get_tag_key(tag) == expected_tag_key
+        if not tag.strip():
+            with pytest.raises(ValueError):
+                assert redis.get_tag_key(tag)
+        else:
+            assert redis.get_tag_key(tag) == expected_tag_key
 
     @pytest.mark.parametrize(
         "key, tags, expected_calls",
         (
             ("foo", [], []),
-            ("foo", [None], []),
             ("foo", ["bar"], [call().sadd("tag:bar", "foo")]),
             (
                 "foo",
@@ -50,6 +49,11 @@ class TestRedisKeyTagging:
         redis.pipeline.assert_has_calls(expected_calls, any_order=True)
         redis.pipeline.assert_has_calls([call().execute()])
 
+    def test_set_does_not_support_whitespaceonly_tag_names(self):
+        redis = RedisKeyTagging()
+        with pytest.raises(ValueError):
+            redis.set("name", "value", tags=[" "])
+
     @pytest.mark.parametrize(
         "tag, smembers, expected_calls",
         (
@@ -64,9 +68,7 @@ class TestRedisKeyTagging:
     )
     @patch("redis_key_tagging.client.RedisKeyTagging.smembers")
     @patch("redis_key_tagging.client.RedisKeyTagging.pipeline")
-    def test_delete_keys_by_tag(
-        self, mock_pipeline, mock_smembers, tag, smembers, expected_calls
-    ):
+    def test_delete_keys_by_tag(self, mock_pipeline, mock_smembers, tag, smembers, expected_calls):
         mock_pipeline.return_value.execute.return_value = [len(expected_calls)] * 2
         mock_smembers.return_value = sorted(smembers)
         redis = RedisKeyTagging()

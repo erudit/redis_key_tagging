@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Tuple, List, Optional
 
 from redis import Redis
 
@@ -10,16 +10,24 @@ class RedisKeyTagging(Redis):
 
     TAG_KEY_PREFIX = "tag:"
 
-    def get_tag_key(self, tag):
+    def get_tag_key(self, tag: str) -> str:
         """
         Get the key for a given ``tag`` by prexing it with the ``TAG_KEY_PREFIX`` class attribute.
         """
-        if tag is not None and isinstance(tag, str) and tag.strip():
-            return f"{self.TAG_KEY_PREFIX}{tag}"
-        else:
-            return None
+        if not tag.strip():
+            raise ValueError("Tag must not be an empty string or only spaces")
+        return f"{self.TAG_KEY_PREFIX}{tag}"
 
-    def set(self, name, value, ex=None, px=None, nx=False, xx=False, tags=[]):
+    def set(
+        self,
+        name: str,
+        value: str,
+        ex: Optional[int] = None,
+        px: Optional[int] = None,
+        nx: bool = False,
+        xx: bool = False,
+        tags: List[str] = list,
+    ) -> Optional[str]:
         """
         Set the value at key ``name`` to ``value``
 
