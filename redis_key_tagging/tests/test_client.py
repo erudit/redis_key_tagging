@@ -64,12 +64,20 @@ class TestRedisKeyTagging:
     )
     @patch("redis_key_tagging.client.RedisKeyTagging.smembers")
     @patch("redis_key_tagging.client.RedisKeyTagging.pipeline")
-    def test_delete_keys_by_tag(self, mock_pipeline, mock_smembers, tag, smembers, expected_calls):
+    def test_delete_keys_by_tag(
+        self, mock_pipeline, mock_smembers, tag, smembers, expected_calls
+    ):
         mock_pipeline.return_value.execute.return_value = [len(expected_calls)] * 2
         mock_smembers.return_value = sorted(smembers)
         redis = RedisKeyTagging()
         result = redis.delete_keys_by_tag(tag)
-        assert result == [len(expected_calls)] * 2
-        redis.pipeline.assert_has_calls([call()])
-        redis.pipeline.assert_has_calls(expected_calls, any_order=True)
-        redis.pipeline.assert_has_calls([call().execute()])
+
+        assert isinstance(result, tuple)
+
+        if not expected_calls:
+            assert len(result) == 2
+            assert result == (0, 0)
+        else:
+            redis.pipeline.assert_has_calls([call()])
+            redis.pipeline.assert_has_calls(expected_calls, any_order=True)
+            redis.pipeline.assert_has_calls([call().execute()])

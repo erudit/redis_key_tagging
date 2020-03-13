@@ -1,3 +1,5 @@
+from typing import Tuple
+
 from redis import Redis
 
 
@@ -41,15 +43,20 @@ class RedisKeyTagging(Redis):
         pipeline.execute()
         return super().set(name, value, ex, px, nx, xx)
 
-    def delete_keys_by_tag(self, tag):
+    def delete_keys_by_tag(self, tag: str) -> Tuple[int, int]:
         """
         Delete all keys from a given tag and remove those keys from the tag.
+
+        :returns: a tuple containing the number of deleted keys and the number of keys removed from
+            the tag
         """
-        pipeline = self.pipeline()
         tag_key = self.get_tag_key(tag)
         if tag_key:
             keys = [key.decode() for key in self.smembers(tag_key)]
             if keys:
+                pipeline = self.pipeline()
                 pipeline.delete(*keys)
                 pipeline.srem(tag_key, *keys)
-        return pipeline.execute()
+                results = pipeline.execute()
+                return tuple(results)
+        return 0, 0
