@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="redis_key_tagging",
-    version="0.0.3",
+    version="0.0.4",
     author="Consortium Érudit",
     author_email="tech@erudit.org",
     description="A Redis client with key tagging and invalidation by tag features.",
