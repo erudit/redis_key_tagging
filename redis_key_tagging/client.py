@@ -26,7 +26,7 @@ class RedisKeyTagging(Redis):
         px: Optional[int] = None,
         nx: bool = False,
         xx: bool = False,
-        tags: List[str] = list,
+        tags: List[str] = list(),
     ) -> Optional[str]:
         """
         Set the value at key ``name`` to ``value``

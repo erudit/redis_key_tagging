@@ -29,6 +29,7 @@ class TestRedisKeyTagging:
     @pytest.mark.parametrize(
         "key, tags, expected_calls",
         (
+            ("foo", None, []),
             ("foo", [], []),
             ("foo", ["bar"], [call().sadd("tag:bar", "foo")]),
             (
@@ -43,7 +44,10 @@ class TestRedisKeyTagging:
     def test_set(self, mock_set, mock_pipeline, key, tags, expected_calls):
         mock_set.return_value = 1
         redis = RedisKeyTagging()
-        result = redis.set(key, "", tags=tags)
+        if tags is None:
+            result = redis.set(key, "")
+        else:
+            result = redis.set(key, "", tags=tags)
         assert result == 1
         redis.pipeline.assert_has_calls([call()])
         redis.pipeline.assert_has_calls(expected_calls, any_order=True)
