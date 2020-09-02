@@ -21,7 +21,7 @@ class RedisKeyTagging(Redis):
     def set(
         self,
         name: str,
-        value: str,
+        value: bytes,
         ex: Optional[int] = None,
         px: Optional[int] = None,
         nx: bool = False,
