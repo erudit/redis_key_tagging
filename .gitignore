@@ -1,3 +1,4 @@
 __pycache__
+build
 dist
 redis_key_tagging.egg-info
